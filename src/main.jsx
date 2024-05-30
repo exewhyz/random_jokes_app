@@ -25,7 +25,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Navbar logoName="Jokes"/>
+    <Navbar />
     <RouterProvider router={router} />
     <Footer />
   </React.StrictMode>
