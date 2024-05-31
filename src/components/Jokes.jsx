@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
+import { useDebounce } from "../hooks/useDebounce";
 
 const Jokes = () => {
+  const [jokes, setJokes] = useState([]);
+  const [category, setCategory] = useState("all");
+  const [count, setCount] = useState("ten");
+  const [search, setSearch] = useState("");
+  const debouncedValue = useDebounce(search, 500);
+
   useEffect(() => {
     async function randomJokes() {
       try {
-        const apiLink = "https://official-joke-api.appspot.com/random_ten";
+        const apiLink =
+          category === "all"
+            ? `https://official-joke-api.appspot.com/jokes/ten`
+            : `https://official-joke-api.appspot.com/jokes/${category}/${count}`;
 
         const response = await fetch(apiLink);
 
@@ -18,13 +28,24 @@ const Jokes = () => {
       }
     }
     randomJokes();
-  }, []);
+  }, [category, count]);
 
-  const [jokes, setJokes] = useState([]);
+  const handleCategory = (event) => {
+    setCategory(event.target.value);
+  };
+
+  const handleCount = (event) => {
+    setCount(event.target.value);
+  };
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
+  console.log(debouncedValue);
 
   return (
     <>
-      <section>
+      <section className="gap-y-4">
         <div className="flex justify-end gap-x-5">
           <div className="border flex items-center justify-center px-2 py-1 rounded-xl gap-4">
             <span className="font-medium text-sm text-gray-600">Search</span>
@@ -32,9 +53,11 @@ const Jokes = () => {
               type="text"
               className="outline-none text-sm text-gray-600"
               placeholder="Search Joke"
+              value={search}
+              onChange={handleSearch}
             />
           </div>
-          <select className="p-2 rounded-lg border-2">
+          <select className="p-2 rounded-lg border-2" onChange={handleCategory}>
             <option value="all" className="bg-gray-200">
               All
             </option>
@@ -48,14 +71,14 @@ const Jokes = () => {
               Knock Knock
             </option>
           </select>
-          <select className="p-2 rounded-lg border-2">
-            <option value="2">2</option>
-            <option value="5">5</option>
-            <option value="10" selected>
+          <select className="p-2 rounded-lg border-2" onChange={handleCount}>
+            <option value="two">2</option>
+            <option value="five">5</option>
+            <option value="ten" selected>
               10
             </option>
-            <option value="15">15</option>
-            <option value="20">20</option>
+            <option value="fifteen">15</option>
+            <option value="twenty">20</option>
           </select>
         </div>
         <div className="my-5 gap-y-3 gap-x-5 flex flex-wrap justify-center">
@@ -70,7 +93,7 @@ const Jokes = () => {
                     <dt className="bg-yellow-200 inline-flex items-center justify-center rounded-full text-sm text-gray-800 px-2 py-1 capitalize mb-2">
                       {joke.type}
                     </dt>
-                    <dd>
+                    <dd className="gap-y-2">
                       <p>{joke.setup}</p>
                       <p>{joke.punchline}</p>
                     </dd>
